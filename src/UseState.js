@@ -15,9 +15,7 @@ function UseState({ name }) {
   React.useEffect(() => {
     if (loading) {
       setTimeout(() => {
-        if (value === SECURITY_CODE) {
-          setError(false);
-        } else {
+        if (value !== SECURITY_CODE) {
           setError(true);
         }
 
@@ -31,7 +29,7 @@ function UseState({ name }) {
       <h2>Eliminar {name}</h2>
       <p>Por favor, escribe el código de seguridad.</p>
 
-      {error && <p>Error: El código es incorrecto</p>}
+      {error && !loading && <p>Error: El código es incorrecto</p>}
       {loading && <p>Cargando...</p>}
 
       <input
@@ -41,7 +39,14 @@ function UseState({ name }) {
           setValue(event.target.value);
         }}
       />
-      <button onClick={() => setLoading(true)}>Comprobar</button>
+      <button
+        onClick={() => {
+          setError(false);
+          setLoading(true);
+        }}
+      >
+        Comprobar
+      </button>
     </div>
   );
 }
