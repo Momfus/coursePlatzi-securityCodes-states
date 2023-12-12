@@ -9,6 +9,9 @@ function UseState({ name }) {
     value: "",
     error: false,
     loading: false,
+    // Lo siguiente es para saber que pantallas mostrar
+    deleted: false,
+    confirmed: false,
   });
 
   // Recordar: gracias a virtual Dom, react solo renderiza los casos que haya cambiado el estado (no todo)
@@ -21,37 +24,74 @@ function UseState({ name }) {
             if (prevState.value !== SECURITY_CODE) {
               return { ...prevState, error: true, loading: false };
             }
-            return { ...prevState, loading: false };
+            return { ...prevState, loading: false, confirmed: true };
           });
         }, 2000);
       }
     }
   }, [state.loading]);
 
-  return (
-    <div>
-      <h2>Eliminar {name}</h2>
-      <p>Por favor, escribe el código de seguridad.</p>
+  if (!state.deleted && !state.confirmed) {
+    return (
+      <div>
+        <h2>Eliminar {name}</h2>
+        <p>Por favor, escribe el código de seguridad.</p>
 
-      {state.error && !state.loading && <p>Error: El código es incorrecto</p>}
-      {state.loading && <p>Cargando...</p>}
+        {state.error && !state.loading && <p>Error: El código es incorrecto</p>}
+        {state.loading && <p>Cargando...</p>}
 
-      <input
-        placeholder="Código de seguridad"
-        value={state.value}
-        onChange={(event) => {
-          setState({ ...state, value: event.target.value });
-        }}
-      />
-      <button
-        onClick={() => {
-          setState({ ...state, error: false, loading: true });
-        }}
-      >
-        Comprobar
-      </button>
-    </div>
-  );
+        <input
+          placeholder="Código de seguridad"
+          value={state.value}
+          onChange={(event) => {
+            setState({ ...state, value: event.target.value });
+          }}
+        />
+        <button
+          onClick={() => {
+            setState({ ...state, error: false, loading: true });
+          }}
+        >
+          Comprobar
+        </button>
+      </div>
+    );
+  } else if (!!state.confirmed && !state.deleted) {
+    return (
+      <React.Fragment>
+        <h2>Eliminar {name}</h2>
+        <p>Pedimos confirmación ¿Estás seguro?</p>
+        <button
+          onClick={() => {
+            setState({ ...state, deleted: true });
+          }}
+        >
+          Si, eliminar
+        </button>
+        <button
+          onClick={() => {
+            setState({ ...state, confirmed: false, value: "" });
+          }}
+        >
+          No, me arrepentí
+        </button>
+      </React.Fragment>
+    );
+  } else {
+    return (
+      <React.Fragment>
+        <h2>Eliminar {name}</h2>
+        <p>Eliminado con éxito</p>
+        <button
+          onClick={() => {
+            setState({ ...state, confirmed: false, deleted: false, value: "" });
+          }}
+        >
+          Resetear, voler atrás
+        </button>
+      </React.Fragment>
+    );
+  }
 }
 
 export { UseState };
