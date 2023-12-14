@@ -6,18 +6,39 @@ const SECURITY_CODE = "paradigma";
 function UseReducer({ name }) {
   const [state, dispatch] = React.useReducer(reducer, initialState); // en vez de setState se usa con reducer por convencion el dispatch
 
+  // Funciones creadas para ser usadas de forma declarativa con el cambio de estado
+  const onConfirm = () => {
+    dispatch({ type: actionTypes.confirm });
+  };
+
+  const onError = () => {
+    dispatch({ type: actionTypes.error });
+  };
+
+  const onWrite = (newValue) => {
+    dispatch({ type: actionTypes.write, payload: newValue });
+  };
+
+  const onCheck = () => {
+    dispatch({ type: actionTypes.check });
+  };
+
+  const onDelete = () => {
+    dispatch({ type: actionTypes.delete });
+  };
+
+  const onReset = () => {
+    dispatch({ type: actionTypes.reset });
+  };
+
   // Recordar: gracias a virtual Dom, react solo renderiza los casos que haya cambiado el estado (no todo)
   React.useEffect(() => {
     if (state.loading) {
       setTimeout(() => {
         if (state.value === SECURITY_CODE) {
-          dispatch({
-            type: actionTypes.confirm,
-          });
+          onConfirm();
         } else {
-          dispatch({
-            type: actionTypes.error,
-          });
+          onError();
         }
       }, 2000);
     }
@@ -36,18 +57,10 @@ function UseReducer({ name }) {
           placeholder="confirmed seguridad"
           value={state.value}
           onChange={(event) => {
-            dispatch({ type: actionTypes.write, payload: event.target.value });
+            onWrite(event.target.value);
           }}
         />
-        <button
-          onClick={() => {
-            dispatch({
-              type: actionTypes.check,
-            });
-          }}
-        >
-          Comprobar
-        </button>
+        <button onClick={onCheck}>Comprobar</button>
       </div>
     );
   } else if (!!state.confirmed && !state.deleted) {
@@ -55,24 +68,8 @@ function UseReducer({ name }) {
       <React.Fragment>
         <h2>Eliminar {name}</h2>
         <p>Pedimos confirmación ¿Estás seguro?</p>
-        <button
-          onClick={() => {
-            dispatch({
-              type: actionTypes.delete,
-            });
-          }}
-        >
-          Si, eliminar
-        </button>
-        <button
-          onClick={() => {
-            dispatch({
-              type: actionTypes.reset,
-            });
-          }}
-        >
-          No, me arrepentí
-        </button>
+        <button onClick={onDelete}>Si, eliminar</button>
+        <button onClick={onReset}>No, me arrepentí</button>
       </React.Fragment>
     );
   } else {
@@ -80,15 +77,8 @@ function UseReducer({ name }) {
       <React.Fragment>
         <h2>Eliminar {name}</h2>
         <p>Eliminado con éxito</p>
-        <button
-          onClick={() => {
-            dispatch({
-              type: actionTypes.reset,
-            });
-          }}
-        >
-          Resetear, voler atrás
-        </button>
+        <button onClick={onReset}>Resetear, voler atrás</button>{" "}
+        {/* Llamarlo onReset es lo mismo que hacer {() => onReset()} */}
       </React.Fragment>
     );
   }
