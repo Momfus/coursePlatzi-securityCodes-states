@@ -12,11 +12,11 @@ function UseReducer({ name }) {
       setTimeout(() => {
         if (state.value === SECURITY_CODE) {
           dispatch({
-            type: "CONFIRM",
+            type: actionTypes.confirm,
           });
         } else {
           dispatch({
-            type: "ERROR",
+            type: actionTypes.error,
           });
         }
       }, 2000);
@@ -36,13 +36,13 @@ function UseReducer({ name }) {
           placeholder="confirmed seguridad"
           value={state.value}
           onChange={(event) => {
-            dispatch({ type: "WRITE", payload: event.target.value });
+            dispatch({ type: actionTypes.write, payload: event.target.value });
           }}
         />
         <button
           onClick={() => {
             dispatch({
-              type: "CHECK",
+              type: actionTypes.check,
             });
           }}
         >
@@ -58,7 +58,7 @@ function UseReducer({ name }) {
         <button
           onClick={() => {
             dispatch({
-              type: "DELETE",
+              type: actionTypes.delete,
             });
           }}
         >
@@ -67,7 +67,7 @@ function UseReducer({ name }) {
         <button
           onClick={() => {
             dispatch({
-              type: "RESET",
+              type: actionTypes.reset,
             });
           }}
         >
@@ -83,7 +83,7 @@ function UseReducer({ name }) {
         <button
           onClick={() => {
             dispatch({
-              type: "RESET",
+              type: actionTypes.reset,
             });
           }}
         >
@@ -102,14 +102,33 @@ const initialState = {
   confirmed: false,
 };
 
+/*
+ Son constantes que definen el tipo de acciones que pueden ser 
+ despachadas en la aplicación. Se utilizan para evitar errores de 
+ escritura y para mantener el código más limpio y organizado
+*/
+const actionTypes = {
+  confirm: "CONFIRM",
+  delete: "DELETE",
+  reset: "RESET",
+  write: "WRITE",
+  check: "CHECK",
+  error: "ERROR",
+};
+
 // Reducer con object
 const reducerObject = (state, payload) => ({
-  ERROR: { ...state, error: true, loading: false },
-  CHECK: { ...state, loading: true },
-  CONFIRM: { ...state, error: false, loading: false, confirmed: true },
-  DELETE: { ...state, deleted: true },
-  RESET: { ...initialState },
-  WRITE: { ...state, value: payload },
+  [actionTypes.error]: { ...state, error: true, loading: false },
+  [actionTypes.check]: { ...state, loading: true },
+  [actionTypes.confirm]: {
+    ...state,
+    error: false,
+    loading: false,
+    confirmed: true,
+  },
+  [actionTypes.delete]: { ...state, deleted: true },
+  [actionTypes.reset]: { ...initialState },
+  [actionTypes.write]: { ...state, value: payload },
 });
 
 const reducer = (state, action) => {
